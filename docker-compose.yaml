@@ -1,0 +1,57 @@
+version: '2'
+
+services:
+# ===================================================================
+  node-app:
+    container_name: node-app
+    hostname: node-app
+    image: node-app:dev
+
+    build:
+      context: .
+      dockerfile: .docker/development.dockerfile
+    volumes:
+      - .:/opt/app
+      - /opt/app/node_modules
+      - ./config:/config
+    ports:
+      - "3000:3000"
+    working_dir: /opt/app
+    environment:
+      NODE_ENV: development
+      PGHOST: pg-node-app
+      PGDATABASE: postgres
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    networks:
+      - node-app-private-network
+    entrypoint: yarn serve
+
+  pg-node-app:
+    container_name: pg-node-app
+    hostname: pg-node-app
+    image: postgres:alpine
+    ports:
+      - 5432:5432
+    environment: 
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    networks:
+      - node-app-private-network
+
+  flyway:
+    image: flyway/flyway:latest-alpine
+    command: -url=jdbc:postgresql://pg-node-app:5432/postgres -user=postgres -password=postgres -connectRetries=60 migrate
+    volumes:
+      - ./migrations/sql:/flyway/sql
+    depends_on:
+      - pg-node-app
+    networks:
+      - node-app-private-network
+
+
+# ===================================================================
+networks:
+  node-app-private-network:
+    driver: bridge
