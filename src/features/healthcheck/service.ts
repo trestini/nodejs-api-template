@@ -7,7 +7,8 @@ export default {
     await next();
   },
   async isReady(ctx: ParameterizedContext, next: Next) {
-    ctx.status = 500;
+    console.log(ctx.config);
+    ctx.status = 200;
     await next();
   }
 

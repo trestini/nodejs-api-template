@@ -1,39 +1,24 @@
-import Koa from "koa";
-import Router from "koa-router";
+console.log(`>>>>>>>>>>> Starting application ${process.env.npm_package_name} ${process.env.npm_package_version}`);
 
-import logger from "koa-logger";
-import json from "koa-json";
-import bodyParser from "koa-bodyparser";
-import favicon from 'koa-favicon';
+const {ENV, NODE_ENV, CONFIG_PATH, CONFIG_RENEW} = process.env;
 
-const cors = require('@koa/cors');
+const isProd = (NODE_ENV === "production" || ENV === "production");
+const configPath = CONFIG_PATH || (isProd ? "/config/config.json" : "./config/config.json");
+const configRenew = CONFIG_RENEW || "10_000";
 
-import { RouteMapper } from "./route-mapper";
-import { middleware as config } from "./utils/config";
+console.log(`-------------------------------------------
+Runtime configuration:
+NODE_ENV: ${NODE_ENV}
+Is production environment: ${isProd}
+Configuation path: ${configPath}
+Configuration rewew ${configRenew}ms
+-------------------------------------------`)
 
-const app = new Koa();
-const rootRouter = new Router();
+import ConfigHandler from './utils/config-handler';
+const config = new ConfigHandler(configPath, parseInt(configRenew));
 
-const PORT = process.env.PORT || process.env.port || 3000;
+import cli from './cli-bootstrap';
+cli(config);
 
-const routeMapper = new RouteMapper(rootRouter);
-
-routeMapper.addRouter("/health", "healthcheck");
-
-app
-  .use(cors())
-  .use(config)
-  .use(favicon())
-  .use(json())
-  .use(logger())
-  .use(bodyParser())
-  .use(rootRouter.routes())
-  .use(rootRouter.allowedMethods())
-
-app.on('error', (e) => {
-  console.error("app error", e);
-});
-
-app.listen(PORT, () => {
-  console.log(`Application started on port ${PORT}`)
-});
+import api from './api-bootstrap';
+api(config);

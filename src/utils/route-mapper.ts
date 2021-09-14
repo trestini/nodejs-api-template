@@ -5,7 +5,7 @@ export class RouteMapper {
   constructor(private rootRouter: Router){}
 
   addRouter(path: string, feature: string) {
-    const router = require(`./features/${feature}/router`);
+    const router = require(`../features/${feature}/router`);
     this.rootRouter.use(path, router);
   }
 
