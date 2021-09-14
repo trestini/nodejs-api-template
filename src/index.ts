@@ -17,8 +17,17 @@ Configuration rewew ${configRenew}ms
 import ConfigHandler from './utils/config-handler';
 const config = new ConfigHandler(configPath, parseInt(configRenew));
 
-import cli from './cli-bootstrap';
-cli(config);
+import AppRestApi from './entrypoints/app-rest-api';
+import LiveReadinessApi from './entrypoints/live-readiness-api';
+import Worker from './entrypoints/worker';
 
-import api from './api-bootstrap';
-api(config);
+[AppRestApi, LiveReadinessApi, Worker].forEach(async EntrypointClass => {
+  const instance = new EntrypointClass();
+  instance.setConfig(config);
+  try {
+    await instance.start();
+    console.log(`[√] Module ${instance.name} started`);
+  } catch (e) {
+    console.log(`[X] Module ${instance.name} failed to start: ${e.message}`);
+  }
+});
