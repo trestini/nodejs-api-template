@@ -10,7 +10,7 @@ console.log(`-------------------------------------------
 Runtime configuration:
 NODE_ENV: ${NODE_ENV}
 Is production environment: ${isProd}
-Configuation path: ${configPath}
+Configuration path: ${configPath}
 Configuration rewew ${configRenew}ms
 -------------------------------------------`)
 
