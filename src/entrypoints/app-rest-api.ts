@@ -13,7 +13,6 @@ import cors  from '@koa/cors';
 import { Next, ParameterizedContext } from "koa";
 
 import { RouteMapper } from "../utils/route-mapper";
-import { rejects } from "assert";
 
 export default class AppRestApi implements Entrypoint {
 
@@ -49,15 +48,23 @@ export default class AppRestApi implements Entrypoint {
         .use(logger())
         .use(bodyParser())
         .use(rootRouter.routes())
-        .use(rootRouter.allowedMethods())
+        .use(rootRouter.allowedMethods());
       
-      app.on('error', (e) => {
+      try {
+        app.on('error', (e) => {
+          reject(e);
+        });
+        
+        const server = app.listen(PORT);
+        server.on('error', (e) => {
+          reject(e);
+        });
+        server.on('listening', () => {
+          resolve(true);
+        });
+      } catch (e) {
         reject(e);
-      });
-      
-      app.listen(PORT, () => {
-        resolve(true);
-      });  
+      }
     });
   }
   

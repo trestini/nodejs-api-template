@@ -29,7 +29,7 @@ export default class LiveReadinessApi implements Entrypoint {
       const app = new Koa();
       const rootRouter = new Router();
       
-      const PORT = this.config.contents.HEALTH_PORT || process.env.HEALTH_PORT || process.env.health_port || 3000;
+      const PORT = this.config.contents.HEALTH_PORT || process.env.HEALTH_PORT || process.env.health_port || 3001;
       
       const routeMapper = new RouteMapper(rootRouter);
   
@@ -49,16 +49,18 @@ export default class LiveReadinessApi implements Entrypoint {
         .use(rootRouter.allowedMethods())
       
       app.on('error', (e) => {
-        console.log(">>>>>>> no reject");
         reject(e);
       });
       
       try {
-        app.listen(PORT, () => {
+        const server = app.listen(PORT);
+        server.on('error', (e) => {
+          reject(e);
+        });
+        server.on('listening', () => {
           resolve(true);
-        });  
+        });
       } catch (e) {
-        console.log(">>>>>> no catch");
         reject(e);
       }
     });
