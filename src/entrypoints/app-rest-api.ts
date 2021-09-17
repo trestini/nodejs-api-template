@@ -10,7 +10,7 @@ import bodyParser from "koa-bodyparser";
 import favicon from 'koa-favicon';
 import cors  from '@koa/cors';
 
-import { Next, ParameterizedContext } from "koa";
+import { Next, Context } from "koa";
 
 import { RouteMapper } from "../utils/route-mapper";
 
@@ -39,7 +39,7 @@ export default class AppRestApi implements Entrypoint {
       
       app
         .use(cors())
-        .use(async (ctx: ParameterizedContext, next: Next) => {
+        .use(async (ctx: Context, next: Next) => {
           ctx.config = this.config.contents;
           await next();
         })
