@@ -5,6 +5,9 @@
   "main": "index.js",
   "author": "Rafael Trestini",
   "license": "MIT",
+  "engines": {
+    "node": "16"
+  },
   "dependencies": {
     "@koa/cors": "^3.1.0",
     "koa": "^2.13.0",
