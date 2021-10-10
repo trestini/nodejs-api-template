@@ -1,0 +1,28 @@
+[
+  {
+    "name": "sample",
+    "file": "sample",
+    "options": {},
+    "depends": ["logger"]
+  },
+  {
+    "name": "logger",
+    "file": "logger",
+    "depends": []
+  },
+  {
+    "name": "worker",
+    "file": "worker",
+    "depends": ["logger"]
+  },
+  {
+    "name": "feature-api",
+    "file": "feature-api",
+    "depends": []
+  },
+  {
+    "name": "health-api",
+    "file": "health-api",
+    "depends": []
+  }
+]

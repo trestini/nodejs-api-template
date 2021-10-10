@@ -3,7 +3,7 @@ import fs from "fs";
 export default class ConfigHandler {
   private _contents: any;
 
-  constructor(readonly configPath: string, readonly configRenew: number) {
+  constructor(readonly configPath: string = "./config/config.json", readonly configRenew: number = 10) {
     this.checkAndWatch();
   }
 
@@ -14,7 +14,7 @@ export default class ConfigHandler {
         this.configPath,
         { interval: this.configRenew },
         (curr, prev) => {
-          console.log("Config file modified. Realoding...");
+          console.log("Config file modified. Reloading...");
           this.reload();
         }
       );

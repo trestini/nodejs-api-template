@@ -1,6 +1,3 @@
-import ConfigHandler from "../utils/config-handler";
-import Entrypoint from "./entrypoint";
-
 import Koa from "koa";
 import Router from "koa-router";
 
@@ -13,29 +10,23 @@ import cors  from '@koa/cors';
 import { Next, Context } from "koa";
 
 import { RouteMapper } from "../utils/route-mapper";
+import Bootable from "../utils/bootable";
+import ConfigHandler from "../utils/config-handler";
 
-export default class AppRestApi implements Entrypoint {
+export default class LiveReadinessApi implements Bootable {
 
-  private config: ConfigHandler;
+  config: ConfigHandler;
 
-  name: string = "Application default API";
-
-  setConfig(config: ConfigHandler){
-    this.config = config;
-  }
-
-  async start(){
+  async boot(){
     return new Promise<any>((resolve, reject) => {
       const app = new Koa();
       const rootRouter = new Router();
       
-      const PORT = this.config.contents.PORT || process.env.PORT || process.env.port || 3000;
+      const PORT = this.config.contents.HEALTH_PORT || process.env.HEALTH_PORT || process.env.health_port || 3001;
       
       const routeMapper = new RouteMapper(rootRouter);
-      
-      this.config.contents.routes && this.config.contents.routes.forEach(route => {
-        routeMapper.addRouter(route.path, route.name);
-      });
+  
+      routeMapper.addRouter("/health", "healthcheck");
       
       app
         .use(cors())
@@ -48,18 +39,19 @@ export default class AppRestApi implements Entrypoint {
         .use(logger())
         .use(bodyParser())
         .use(rootRouter.routes())
-        .use(rootRouter.allowedMethods());
+        .use(rootRouter.allowedMethods())
+      
+      app.on('error', (e) => {
+        reject(e);
+      });
       
       try {
-        app.on('error', (e) => {
-          reject(e);
-        });
-        
         const server = app.listen(PORT);
         server.on('error', (e) => {
           reject(e);
         });
         server.on('listening', () => {
+          console.log("Healthcheck API listening on port", PORT);
           resolve(true);
         });
       } catch (e) {

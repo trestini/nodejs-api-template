@@ -17,17 +17,30 @@ Configuration rewew ${configRenew}ms
 import ConfigHandler from './utils/config-handler';
 const config = new ConfigHandler(configPath, parseInt(configRenew));
 
-import AppRestApi from './entrypoints/app-rest-api';
-import LiveReadinessApi from './entrypoints/live-readiness-api';
-import Worker from './entrypoints/worker';
+console.log("- Global configuration module loaded");
 
-[AppRestApi, LiveReadinessApi, Worker].forEach(async EntrypointClass => {
-  const instance = new EntrypointClass();
-  instance.setConfig(config);
-  try {
-    await instance.start();
-    console.log(`[√] Module ${instance.name} started`);
-  } catch (e) {
-    console.log(`[X] Module ${instance.name} failed to start: ${e.message}`);
-  }
-});
+// import AppRestApi from './entrypoints/app-rest-api';
+// import LiveReadinessApi from './entrypoints/live-readiness-api';
+// import Worker from './entrypoints/worker';
+
+// [AppRestApi, LiveReadinessApi, Worker].forEach(async EntrypointClass => {
+//   const instance = new EntrypointClass();
+//   instance.setConfig(config);
+//   try {
+//     await instance.start();
+//     console.log(`[√] Module ${instance.name} started`);
+//   } catch (e) {
+//     console.log(`[X] Module ${instance.name} failed to start: ${e.message}`);
+//   }
+// });
+
+import {loadModules} from './utils/di';
+
+console.log("- Starting dependency injection");
+const loaded = loadModules(config)
+  .filter(m => (m.bootable));
+
+console.log("- Starting bootable modules");
+Promise.all(loaded.map(b => b.instance.boot()))
+  .then(_ => (console.log("[√] Application started")))
+  .catch(e => (console.error("[X] Application startup failed", e)));

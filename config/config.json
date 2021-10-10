@@ -1,3 +1,4 @@
 {
-    "routes": []
+  "PORT": 4000,
+  "logLevel": 1
 }
