@@ -1,4 +1,7 @@
-console.log(`>>>>>>>>>>> Starting application ${process.env.npm_package_name} ${process.env.npm_package_version}`);
+const {npm_package_name, npm_package_version} = process.env;
+const appLabel = `${npm_package_name}:${npm_package_version}`;
+
+console.log(`>>>>>>>>>>>>>>>>>>>>>> Starting application ${appLabel}`);
 
 const {ENV, NODE_ENV, CONFIG_PATH, CONFIG_RENEW} = process.env;
 
@@ -42,5 +45,8 @@ const loaded = loadModules(config)
 
 console.log("- Starting bootable modules");
 Promise.all(loaded.map(b => b.instance.boot()))
-  .then(_ => (console.log("[√] Application started")))
-  .catch(e => (console.error("[X] Application startup failed", e)));
+  .then(_ => console.log(`[√] Application ${appLabel} succesfully started`))
+  .catch(e => {
+    console.error(`[X] Application ${appLabel} startup failed`, e);
+    process.exit(1);
+  });
