@@ -13,17 +13,13 @@ import { RouteMapper } from "../utils/route-mapper";
 import Bootable from "../utils/bootable";
 import ConfigHandler from "../utils/config-handler";
 import Logger from "./logger";
-import MongoDB from "./mongodb";
 
 export default class LiveReadinessApi implements Bootable {
 
   config: ConfigHandler;
   logger: Logger;
-  mongodb: MongoDB;
 
   async boot(){
-
-    this.logger.info(`Starting Koa application with mongoose: ${this.mongodb.state}`);
 
     return new Promise<any>((resolve, reject) => {
       const app = new Koa();
@@ -39,10 +35,6 @@ export default class LiveReadinessApi implements Bootable {
         .use(cors())
         .use(async (ctx: Context, next: Next) => {
           ctx.config = this.config.contents;
-          await next();
-        })
-        .use(async (ctx: Context, next: Next) => {
-          ctx.mongodb = this.mongodb;
           await next();
         })
         .use(favicon())
