@@ -12,7 +12,6 @@ import { Next, Context } from "koa";
 import { RouteMapper } from "../utils/route-mapper";
 import Bootable from "../utils/bootable";
 import ConfigHandler from "../utils/config-handler";
-import MongoDB from "./mongodb";
 
 import {readdirSync} from 'fs';
 
@@ -20,7 +19,6 @@ export default class FeatureApi implements Bootable {
 
   config: ConfigHandler;
   koaApp: Koa = new Koa();
-  mongodb: MongoDB;
 
   async boot(){
     const PORT = this.config.contents.PORT || process.env.PORT || process.env.port || 3000;
@@ -54,10 +52,6 @@ export default class FeatureApi implements Bootable {
         .use(cors())
         .use(async (ctx: Context, next: Next) => {
           ctx.config = this.config.contents;
-          await next();
-        })
-        .use(async (ctx: Context, next: Next) => {
-          ctx.mongodb = this.mongodb;
           await next();
         })
         .use(favicon())
