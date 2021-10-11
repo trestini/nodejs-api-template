@@ -1,11 +1,5 @@
 [
   {
-    "name": "sample",
-    "file": "sample",
-    "options": {},
-    "depends": ["logger"]
-  },
-  {
     "name": "logger",
     "file": "logger",
     "depends": []
