@@ -12,11 +12,11 @@
   {
     "name": "feature-api",
     "file": "feature-api",
-    "depends": []
+    "depends": ["logger"]
   },
   {
     "name": "health-api",
     "file": "health-api",
-    "depends": []
+    "depends": ["logger"]
   }
 ]
