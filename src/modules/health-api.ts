@@ -37,6 +37,10 @@ export default class LiveReadinessApi implements Bootable {
           ctx.config = this.config.contents;
           await next();
         })
+        .use(async (ctx: Context, next: Next) => {
+          ctx.log = this.logger;
+          await next();
+        })
         .use(favicon())
         .use(json())
         .use(logger())

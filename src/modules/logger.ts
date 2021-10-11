@@ -1,27 +1,39 @@
+import { createLogger } from "bunyan";
+import ConfigHandler from "../utils/config-handler";
+import { ifThenElse } from "../utils/f";
+
+const {ENV, NODE_ENV} = process.env;
+const isProd = (NODE_ENV === "production" || ENV === "production");
+
+type LoggerObj = {
+  debug, info, warn, error
+}
 export default class Logger {
 
-  private logLevel: number;
+  config: ConfigHandler
+  logger: LoggerObj
 
-  set config(conf){
-    const { logLevel } = conf.contents;
-    this.logLevel = logLevel || 1;
-    this.debug("Global config module registered in Logger class with logLevel " + logLevel);
+  constructor(){
+    this.logger = ifThenElse(isProd,
+      () => (createLogger({name: 'Default'})),
+      () => console
+    );
   }
 
   debug(msg){
-    this.logLevel < 1 && console.log("DEBUG", msg);
+    this.logger.debug(msg);
   }
 
   info(msg){
-    this.logLevel < 2 && console.log("INFO", msg);
+    this.logger.info(msg);
   }
 
   warn(msg){
-    this.logLevel < 3 && console.warn("WARN", msg);
+    this.logger.warn(msg);
   }
 
   error(msg){
-    this.logLevel < 4 && console.error("ERROR", msg);
+    this.logger.error(msg);
   }
 
 }
