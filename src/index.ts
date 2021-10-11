@@ -1,11 +1,11 @@
 const {npm_package_name, npm_package_version} = process.env;
 const appLabel = `${npm_package_name}:${npm_package_version}`;
 
+const {ENV, NODE_ENV, CONFIG_PATH, CONFIG_RENEW} = process.env;
+const isProd = (NODE_ENV === "production" || ENV === "production");
+
 console.log(`>>>>>>>>>>>>>>>>>>>>>> Starting application ${appLabel}`);
 
-const {ENV, NODE_ENV, CONFIG_PATH, CONFIG_RENEW} = process.env;
-
-const isProd = (NODE_ENV === "production" || ENV === "production");
 const configPath = CONFIG_PATH || (isProd ? "/config/config.json" : "./config/config.json");
 const configRenew = CONFIG_RENEW || "10_000";
 
@@ -21,21 +21,6 @@ import ConfigHandler from './utils/config-handler';
 const config = new ConfigHandler(configPath, parseInt(configRenew));
 
 console.log("- Global configuration module loaded");
-
-// import AppRestApi from './entrypoints/app-rest-api';
-// import LiveReadinessApi from './entrypoints/live-readiness-api';
-// import Worker from './entrypoints/worker';
-
-// [AppRestApi, LiveReadinessApi, Worker].forEach(async EntrypointClass => {
-//   const instance = new EntrypointClass();
-//   instance.setConfig(config);
-//   try {
-//     await instance.start();
-//     console.log(`[√] Module ${instance.name} started`);
-//   } catch (e) {
-//     console.log(`[X] Module ${instance.name} failed to start: ${e.message}`);
-//   }
-// });
 
 import {loadModules} from './utils/di';
 
